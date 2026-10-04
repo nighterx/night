@@ -71,7 +71,9 @@ local teleportService = cloneref(game:GetService('TeleportService'))
 local AUTH_URL = 'https://httpsnightdream-auth.chunkpool.workers.dev/api/auth'
 local AUTH_FAIL_OPEN = false
 
+local AUTH_VERSION = 'v5'
 local authDetail = 'n/a'
+local authHwid = 'unset'
 
 local function checkWhitelist()
 	-- The key comes from the loadstring the Discord panel hands out.
@@ -86,6 +88,7 @@ local function checkWhitelist()
 		local suc, res = pcall(gethwid)
 		hwid = suc and res or nil
 	end
+	authHwid = hwid and 'yes' or 'NO'
 
 	local suc, response = pcall(request, {
 		Url = AUTH_URL,
@@ -119,6 +122,11 @@ local function checkWhitelist()
 end
 
 local whitelisted, expired = checkWhitelist()
+
+-- Log every check so a kick can be traced afterwards (night/auth_log.txt).
+pcall(function()
+	appendfile('night/auth_log.txt', os.date('%H:%M:%S') .. ' place=' .. tostring(game.PlaceId) .. ' result=' .. tostring(whitelisted) .. ' detail=' .. authDetail .. ' hwid=' .. authHwid .. ' ver=' .. AUTH_VERSION .. '\n')
+end)
 if whitelisted == nil and AUTH_FAIL_OPEN then whitelisted = true end
 if not whitelisted then
 	local reason = '[nightdream] Invalid or missing key. Redeem one in our Discord.'
@@ -127,7 +135,7 @@ if not whitelisted then
 	elseif expired then
 		reason = '[nightdream] Your key expired. Redeem a new one in our Discord.'
 	end
-	pcall(function() playersService.LocalPlayer:Kick(reason .. ' [' .. authDetail .. ']') end)
+	pcall(function() playersService.LocalPlayer:Kick(reason .. ' [' .. authDetail .. ' | ' .. AUTH_VERSION .. ']') end)
 	do return end
 end
 
