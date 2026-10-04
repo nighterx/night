@@ -71,10 +71,12 @@ local teleportService = cloneref(game:GetService('TeleportService'))
 local AUTH_URL = 'https://define-expenditures-lovely-earned.trycloudflare.com/api/auth'
 local AUTH_FAIL_OPEN = false
 
+local authDetail = 'n/a'
+
 local function checkWhitelist()
 	-- The key comes from the loadstring the Discord panel hands out.
 	local key = getgenv().script_key or shared.script_key or script_key
-	if type(key) ~= 'string' or key == '' then return false end
+	if type(key) ~= 'string' or key == '' then authDetail = 'no key' return false end
 	getgenv().script_key = key
 
 	local nonce = httpService:GenerateGUID(false)
@@ -97,20 +99,22 @@ local function checkWhitelist()
 	})
 
 	-- nil means the auth server could not be reached or replied with garbage.
-	if not suc or type(response) ~= 'table' then return nil end
+	if not suc or type(response) ~= 'table' then authDetail = 'request failed' return nil end
 	if response.StatusCode == 403 then
+		authDetail = '403'
 		local ok, data = pcall(function()
 			return httpService:JSONDecode(response.Body)
 		end)
 		return false, ok and type(data) == 'table' and data.expired == true
 	end
-	if response.StatusCode ~= 200 then return nil end
+	if response.StatusCode ~= 200 then authDetail = 'status ' .. tostring(response.StatusCode) return nil end
 
 	local ok, data = pcall(function()
 		return httpService:JSONDecode(response.Body)
 	end)
-	if not ok or type(data) ~= 'table' then return nil end
+	if not ok or type(data) ~= 'table' then authDetail = 'bad body' return nil end
 
+	if data.nonce ~= nonce then authDetail = 'nonce' end
 	return data.whitelisted == true and data.nonce == nonce
 end
 
@@ -123,7 +127,7 @@ if not whitelisted then
 	elseif expired then
 		reason = '[nightdream] Your key expired. Redeem a new one in our Discord.'
 	end
-	pcall(function() playersService.LocalPlayer:Kick(reason) end)
+	pcall(function() playersService.LocalPlayer:Kick(reason .. ' [' .. authDetail .. ']') end)
 	do return end
 end
 
