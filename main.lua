@@ -68,13 +68,14 @@ local httpService = cloneref(game:GetService('HttpService'))
 local teleportService = cloneref(game:GetService('TeleportService'))
 
 -- Whitelist.
-local AUTH_URL = 'https://dans-unit-actors-sale.trycloudflare.com/api/auth'
+local AUTH_URL = 'https://define-expenditures-lovely-earned.trycloudflare.com/api/auth'
 local AUTH_FAIL_OPEN = false
 
 local function checkWhitelist()
 	-- The key comes from the loadstring the Discord panel hands out.
-	local key = getgenv().script_key
+	local key = getgenv().script_key or shared.script_key or script_key
 	if type(key) ~= 'string' or key == '' then return false end
+	getgenv().script_key = key
 
 	local nonce = httpService:GenerateGUID(false)
 
@@ -214,7 +215,7 @@ local function finishLoading()
 
 		-- Keep the key across teleports so the whitelist check passes again.
 		if type(getgenv().script_key) == 'string' then
-			teleportScript = 'script_key = "' .. getgenv().script_key .. '"\n' .. teleportScript
+			teleportScript = 'getgenv().script_key = "' .. getgenv().script_key .. '"\n' .. teleportScript
 		end
 
 		if identifyexecutor and ({identifyexecutor()})[1] == 'Potassium' then
