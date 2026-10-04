@@ -67,6 +67,66 @@ local playersService = cloneref(game:GetService('Players'))
 local httpService = cloneref(game:GetService('HttpService'))
 local teleportService = cloneref(game:GetService('TeleportService'))
 
+-- Whitelist.
+local AUTH_URL = 'https://dans-unit-actors-sale.trycloudflare.com/api/auth'
+local AUTH_FAIL_OPEN = false
+
+local function checkWhitelist()
+	-- The key comes from the loadstring the Discord panel hands out.
+	local key = getgenv().script_key
+	if type(key) ~= 'string' or key == '' then return false end
+
+	local nonce = httpService:GenerateGUID(false)
+
+	local hwid
+	if gethwid then
+		local suc, res = pcall(gethwid)
+		hwid = suc and res or nil
+	end
+
+	local suc, response = pcall(request, {
+		Url = AUTH_URL,
+		Method = 'POST',
+		Headers = {['Content-Type'] = 'application/json'},
+		Body = httpService:JSONEncode({
+			key = key,
+			hwid = hwid,
+			nonce = nonce,
+		}),
+	})
+
+	-- nil means the auth server could not be reached or replied with garbage.
+	if not suc or type(response) ~= 'table' then return nil end
+	if response.StatusCode == 403 then
+		local ok, data = pcall(function()
+			return httpService:JSONDecode(response.Body)
+		end)
+		return false, ok and type(data) == 'table' and data.expired == true
+	end
+	if response.StatusCode ~= 200 then return nil end
+
+	local ok, data = pcall(function()
+		return httpService:JSONDecode(response.Body)
+	end)
+	if not ok or type(data) ~= 'table' then return nil end
+
+	return data.whitelisted == true and data.nonce == nonce
+end
+
+local whitelisted, expired = checkWhitelist()
+if whitelisted == nil and AUTH_FAIL_OPEN then whitelisted = true end
+if not whitelisted then
+	local reason = '[nightdream] Invalid or missing key. Redeem one in our Discord.'
+	if whitelisted == nil then
+		reason = '[nightdream] Auth server unreachable, try again later.'
+	elseif expired then
+		reason = '[nightdream] Your key expired. Redeem a new one in our Discord.'
+	end
+	pcall(function() playersService.LocalPlayer:Kick(reason) end)
+	do return end
+end
+
+
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local res
@@ -151,6 +211,11 @@ local function finishLoading()
 
 		local closetArg = getgenv().Closet and '({Closet=true})' or '()'
 		local teleportScript = 'shared.vapereload = true\nloadstring(game:HttpGet("' .. LOADER_URL .. '", true), "loader")' .. closetArg
+
+		-- Keep the key across teleports so the whitelist check passes again.
+		if type(getgenv().script_key) == 'string' then
+			teleportScript = 'script_key = "' .. getgenv().script_key .. '"\n' .. teleportScript
+		end
 
 		if identifyexecutor and ({identifyexecutor()})[1] == 'Potassium' then
 			teleportScript = 'task.wait(12)\n' .. teleportScript
