@@ -68,7 +68,7 @@ local httpService = cloneref(game:GetService('HttpService'))
 local teleportService = cloneref(game:GetService('TeleportService'))
 
 -- Whitelist.
-local AUTH_URL = 'https://nightdream-bot-production.up.railway.app/api/auth'
+local AUTH_URL = 'https://vh-prod-nightdream-bot-main-bed63a-3f833fc0.livemy.site/api/auth'
 local AUTH_FAIL_OPEN = false
 
 local authDetail = 'n/a'
