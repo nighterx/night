@@ -68,34 +68,24 @@ local httpService = cloneref(game:GetService('HttpService'))
 local teleportService = cloneref(game:GetService('TeleportService'))
 
 -- Whitelist.
-local AUTH_URL = 'https://vh-prod-nightdream-bot-main-bed63a-3f833fc0.livemy.site/api/auth'
+local AUTH_URL = 'https://httpsnightdream-auth.chunkpool.workers.dev/api/auth'
 local AUTH_FAIL_OPEN = false
 
 local authDetail = 'n/a'
 
 local function checkWhitelist()
-	-- The key comes from the loadstring the Discord panel hands out, or the saved copy.
-	local keyFile = 'night/profiles/key.txt'
+	-- The key comes from the loadstring the Discord panel hands out.
 	local key = getgenv().script_key or shared.script_key or script_key
-	if (type(key) ~= 'string' or key == '') and isfile(keyFile) then
-		key = readfile(keyFile)
-	end
 	if type(key) ~= 'string' or key == '' then authDetail = 'no key' return false end
 	getgenv().script_key = key
-	pcall(writefile, keyFile, key)
 
 	local nonce = httpService:GenerateGUID(false)
 
-	-- gethwid can return nothing right after a teleport, so retry.
 	local hwid
-	for _ = 1, 20 do
-		if gethwid then
-			local suc, res = pcall(gethwid)
-			if suc and type(res) == 'string' and res ~= '' then hwid = res break end
-		end
-		task.wait(0.25)
+	if gethwid then
+		local suc, res = pcall(gethwid)
+		hwid = suc and res or nil
 	end
-	if not hwid then authDetail = 'no hwid' return nil end
 
 	local suc, response = pcall(request, {
 		Url = AUTH_URL,
