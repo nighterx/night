@@ -135,7 +135,7 @@ pcall(migrateProfiles)
 local function finishLoading()
 	vape.Init = nil
 	if not vape.Load then
-		warn('[aerov4] vape.Load is nil skipping load')
+		warn('[night] vape.Load is nil skipping load')
 		return
 	end
 	vape:Load()
@@ -186,7 +186,7 @@ local function finishLoading()
 	if not shared.vapereload then
 		if not vape.Categories then return end
 		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
-			vape:CreateNotification('[aerov4] Finished Loading', 'wsg ' .. shared.aerov4User .. ' ' .. (vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press ' .. table.concat(vape.Keybind, ' + '):upper() .. ' to open GUI'), 5)
+			vape:CreateNotification('[night] Finished Loading', 'wsg ' .. shared.aerov4User .. ' ' .. (vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press ' .. table.concat(vape.Keybind, ' + '):upper() .. ' to open GUI'), 5)
 		end
 	end
 end
@@ -218,18 +218,18 @@ if not guiFunc then
 		end
 		context = '\n\nContext:\n' .. table.concat(parts, '\n')
 	end
-	error('[aerov4] syntax error in ' .. gui .. '.lua' .. '\n' .. errMsg .. context)
+	error('[night] syntax error in ' .. gui .. '.lua' .. '\n' .. errMsg .. context)
 end
 vape = guiFunc()
 if not vape then
-	error('[aerov4] GUI returned nil file may be corrupted try deleting night/guis/' .. gui .. '.lua and reinjecting.')
+	error('[night] GUI returned nil file may be corrupted try deleting night/guis/' .. gui .. '.lua and reinjecting.')
 end
 if not vape.Load then
 	if delfile then pcall(function() delfile('night/guis/' .. gui .. '.lua') end) end
-	error('[aerov4] gui file corrupted (missing load) reinject..')
+	error('[night] gui file corrupted (missing load) reinject..')
 end
 if not vape.Init and not vape.Load then
-	error('[aerov4] failed to initialize properly reinject to fix this bs')
+	error('[night] failed to initialize properly reinject to fix this bs')
 end
 shared.vape = vape
 task.wait(0.1)
@@ -275,7 +275,7 @@ if not shared.VapeIndependent then
 				end
 				ctx = '\n\nContext:\n' .. table.concat(parts, '\n')
 			end
-			error('[aerov4] syntax error in ' .. gameFileId .. '.lua\n' .. msg .. ctx)
+			error('[night] syntax error in ' .. gameFileId .. '.lua\n' .. msg .. ctx)
 		end
 		gameFunc(...)
 	else

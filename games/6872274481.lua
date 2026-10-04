@@ -12,13 +12,13 @@ local run = function(func)
 		local ok, err = pcall(func)
 		_runBusy = false
 		if not ok then
-			warn('[aerov4] module failed to load: ' .. tostring(err))
+			warn('[night] module failed to load: ' .. tostring(err))
 		end
 		return
 	end
 	local ok, err = pcall(func)
 	if not ok then
-		warn('[aerov4] module failed to load: ' .. tostring(err))
+		warn('[night] module failed to load: ' .. tostring(err))
 	end
 end
 task.wait()
@@ -183,7 +183,7 @@ setmetatable(remotes, {
 			task.delay(10, function()
 				if rawget(remotes, key) == nil then
 					pcall(function()
-						vape.Notify('[aerov4] remote "' .. tostring(key) .. '" changed or removed some features may not work bru (dm @5qvx for fix)', 6)
+						vape.Notify('[night] remote "' .. tostring(key) .. '" changed or removed some features may not work bru (dm @5qvx for fix)', 6)
 					end)
 				end
 			end)
@@ -7435,7 +7435,7 @@ run(function()
 			local took = tick() - sentAt
 
 			if took > 0.35 then
-				warn('[aerov4] fasthits server took ' .. math.floor(took * 1000) .. 'ms')
+				warn('[night] fasthits server took ' .. math.floor(took * 1000) .. 'ms')
 			end
 
 			if not ok or not res or not res.PrimaryPart then
@@ -7838,7 +7838,7 @@ run(function()
 		end)
 
 		if not gok then
-			warn('[aerov4] gloop failed: '..tostring(gerr))
+			warn('[night] gloop failed: '..tostring(gerr))
 
 			if ownsBusy then
 				fhRestoreSword()
