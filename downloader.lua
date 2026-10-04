@@ -10,7 +10,7 @@ local delfile = delfile or function(file) writefile(file, '') end
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/nighterx/night/'..readfile('aerov4/profiles/commit.txt')..'/'..select(1, path:gsub('aerov4/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/nighterx/night/'..readfile('night/profiles/commit.txt')..'/'..select(1, path:gsub('night/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then error(res) end
 		if path:find('%.lua') then
@@ -31,22 +31,22 @@ local function wipeFolder(path)
 	end
 end
 
-for _, folder in {'aerov4', 'aerov4/games', 'aerov4/profiles', 'aerov4/assets', 'aerov4/libraries', 'aerov4/guis'} do
+for _, folder in {'aerov4', 'night/games', 'night/profiles', 'night/assets', 'night/libraries', 'night/guis'} do
 	if not isfolder(folder) then makefolder(folder) end
 end
 
-if not isfile('aerov4/profiles/commit.txt') then
-	writefile('aerov4/profiles/commit.txt', 'main')
+if not isfile('night/profiles/commit.txt') then
+	writefile('night/profiles/commit.txt', 'main')
 end
 
 local function downloadPremadeProfiles(commit)
 	local httpService = game:GetService('HttpService')
-	if isfolder('aerov4/profiles/premade') then
-		for _, file in listfiles('aerov4/profiles/premade') do
+	if isfolder('night/profiles/premade') then
+		for _, file in listfiles('night/profiles/premade') do
 			pcall(function() if isfile(file) then delfile(file) end end)
 		end
 	else
-		makefolder('aerov4/profiles/premade')
+		makefolder('night/profiles/premade')
 	end
 	local success, response = pcall(function()
 		return game:HttpGet('https://api.github.com/repos/nighterx/night/contents/profiles/premade?ref=' .. commit)
@@ -58,7 +58,7 @@ local function downloadPremadeProfiles(commit)
 				if file.name and file.name:find('.txt') and file.name ~= 'commit.txt' then
 					local baseName = (file.name:match('^(.-)%.txt$') or file.name):gsub('%d+$', '')
 					local fileId = (game.GameId == 2619619496) and game.GameId or game.PlaceId
-					local filePath = 'aerov4/profiles/premade/' .. baseName .. tostring(fileId) .. '.txt'
+					local filePath = 'night/profiles/premade/' .. baseName .. tostring(fileId) .. '.txt'
 					local ds, dc = pcall(function() return game:HttpGet(file.download_url, true) end)
 					if ds and dc and dc ~= '404: Not Found' then writefile(filePath, dc) end
 				end
@@ -68,8 +68,8 @@ local function downloadPremadeProfiles(commit)
 end
 
 if not shared.VapeDeveloper then
-	local commit = isfile('aerov4/profiles/commit.txt') and readfile('aerov4/profiles/commit.txt') or ''
-	local latest = isfile('aerov4/profiles/latest.txt') and readfile('aerov4/profiles/latest.txt') or ''
+	local commit = isfile('night/profiles/commit.txt') and readfile('night/profiles/commit.txt') or ''
+	local latest = isfile('night/profiles/latest.txt') and readfile('night/profiles/latest.txt') or ''
 	if #commit ~= 40 then
 		local ok, res = pcall(function()
 			return game:HttpGet('https://api.github.com/repos/nighterx/night/commits/main', true)
@@ -80,7 +80,7 @@ if not shared.VapeDeveloper then
 		end
 		if #commit ~= 40 then commit = 'main' end
 		latest = commit
-		pcall(writefile, 'aerov4/profiles/latest.txt', latest)
+		pcall(writefile, 'night/profiles/latest.txt', latest)
 	elseif #latest == 40 and latest ~= commit then
 		commit = latest
 	end
@@ -91,29 +91,29 @@ if not shared.VapeDeveloper then
 		if ok and res then
 			local h = res:match('"sha":"([a-f0-9]+)"')
 			if h and #h == 40 then
-				pcall(writefile, 'aerov4/profiles/latest.txt', h)
+				pcall(writefile, 'night/profiles/latest.txt', h)
 			end
 		end
 	end)
-	if commit ~= 'main' and (isfile('aerov4/profiles/commit.txt') and readfile('aerov4/profiles/commit.txt') or '') ~= commit then
+	if commit ~= 'main' and (isfile('night/profiles/commit.txt') and readfile('night/profiles/commit.txt') or '') ~= commit then
 		wipeFolder('aerov4')
-		wipeFolder('aerov4/games')
-		wipeFolder('aerov4/guis')
-		pcall(function() if isfile('aerov4/guis/new.lua') then delfile('aerov4/guis/new.lua') end end)
-		wipeFolder('aerov4/libraries')
-		if isfolder('aerov4/profiles/premade') then
-			for _, file in listfiles('aerov4/profiles/premade') do
+		wipeFolder('night/games')
+		wipeFolder('night/guis')
+		pcall(function() if isfile('night/guis/new.lua') then delfile('night/guis/new.lua') end end)
+		wipeFolder('night/libraries')
+		if isfolder('night/profiles/premade') then
+			for _, file in listfiles('night/profiles/premade') do
 				pcall(function() if isfile(file) then delfile(file) end end)
 			end
 		end
 	end
-	local oldCommit = isfile('aerov4/profiles/commit.txt') and readfile('aerov4/profiles/commit.txt') or ''
-	writefile('aerov4/profiles/commit.txt', commit)
+	local oldCommit = isfile('night/profiles/commit.txt') and readfile('night/profiles/commit.txt') or ''
+	writefile('night/profiles/commit.txt', commit)
 	local needPremade = (oldCommit ~= commit)
 	if not needPremade then
 		needPremade = true
-		if isfolder('aerov4/profiles/premade') then
-			for _ in listfiles('aerov4/profiles/premade') do
+		if isfolder('night/profiles/premade') then
+			for _ in listfiles('night/profiles/premade') do
 				needPremade = false
 				break
 			end
@@ -124,6 +124,6 @@ if not shared.VapeDeveloper then
 	end
 end
 
-return loadstring(downloadFile('aerov4/main.lua'), 'main')({
+return loadstring(downloadFile('night/main.lua'), 'main')({
 	Closet = _args.Closet,
 })
