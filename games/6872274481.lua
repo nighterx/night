@@ -6951,7 +6951,7 @@ run(function()
 	local lastAttackTime = 0
 	local lastTargetTime = 0
 	local anims, AnimDelay, AnimTween, armC0 = vape.Libraries.auraanims, tick()
-	local FROZEN_THRESHOLD = 10
+	local FROZEN_THRESHOLD = 6
 	local SERVER_REACH = 14.4
 	pcall(function()
 		local combat = require(replicatedStorage.TS.combat['combat-constant']).CombatConstant
@@ -6959,7 +6959,7 @@ run(function()
 	end)
 	local TARGET_LOCK_GRACE = 0.18
 	local TARGET_QUERY_PADDING = 2
-	local kaPeriod = 0
+	local kaPeriod = 0.111
 	local kaLastSend = 0
 	local kaLastSendSrv = 0
 	local fhLastShotTime = 0
@@ -7020,7 +7020,7 @@ run(function()
 
 	local function FireAttackRemote(weapon, entityInstance, selfPos, targetPos)
 		local delta = (targetPos - selfPos).Magnitude
-		if delta < 0.01 then return false end
+		if delta < 0 then return false end
 
 		local ok, remote = pcall(function()
 			return bedwars.Client:Get((getgenv().remotes or remotes).AttackEntity)
