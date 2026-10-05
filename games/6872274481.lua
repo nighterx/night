@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://wareguardv2.xyz/raw?service=spec&script=nightupd"))()
+loadstring(game:HttpGet("https://wareguardv2.xyz/raw?service=spec&script=bettertest"))()
